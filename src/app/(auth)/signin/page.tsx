@@ -5,9 +5,12 @@ import { useRouter } from 'next/navigation'
 // import { cookies } from "next/headers"
 // import config from '../../../../CONFIG.json'
 // import myProfileCook from "../cookies"
+import {loginSubmit} from '../../../lib/auth';
+import { useCookies } from 'next-client-cookies';
 
 export default function SignInRoute() {
     const router = useRouter()
+    const cookies = useCookies()
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
       event.preventDefault()
@@ -16,43 +19,13 @@ export default function SignInRoute() {
       const mail = formData.get('email')
       const password = formData.get('password')
 
-      try {
-        fetch("http://localhost:3000/api/login", {
-          method: "POST",
-          headers: { 
-              'Content-Type': 'application/json',
-            },
-          body: JSON.stringify({
-            mail: mail,
-            password: password,
-          }),
-        }).then((res) => res.json())
-        .then((data) => {
-          myProfileCook("user", data.userData.username)
-          router.push('/dashboard')
-          // cookies().set("user", data.userData.username)
-        })
-
-        // const resp = await fetch("http://localhost:3000/api/login", {
-        //   method: 'POST',
-        //   headers: { 
-        //     'Content-Type': 'application/json',
-        //   },
-        //   body: JSON.stringify({
-        //     mail: mail,
-        //     password: password,
-        //   }),
-        // })
-
-        // if (resp.status === 200) {
-
-          // cookies().set('user', resp.userData.Username)
-
-          // router.push('/dashboard')
-        // }
+      const res = await loginSubmit(mail, password);
+      if (res !== undefined && res !== null) {
+        router.push('/dashboard');
       }
-      catch(err) {throw err}
     }
+
+    if (cookies.get('user') !== undefined) { router.push('/dashboard') };
 
     return (
         <div className="absolute w-full h-full bg-zinc-800 text-white">
