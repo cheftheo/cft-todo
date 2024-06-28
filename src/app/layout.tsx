@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 const montserrat = Montserrat({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "cft roadmap website",
+  title: "cft todo web",
   description: "developed with heart and soul by chef theo",
 };
 

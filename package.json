@@ -1,5 +1,5 @@
 {
-  "name": "cft-roadmap-web",
+  "name": "cft-todo-web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,11 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fortawesome/free-solid-svg-icons": "^6.5.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "axios": "^1.7.2",
     "express": "^4.19.2",
     "expressjs": "^1.0.1",
     "next": "14.2.4",
     "next-auth": "^4.24.7",
+    "next-client-cookies": "^1.1.1",
     "react": "^18",
     "react-dom": "^18"
   },

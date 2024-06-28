@@ -20,6 +20,17 @@ export default function Dashboard() {
     const [filteredPosts, setFilteredPosts] = useState<any[]>([]);
     const [generalData, setGeneralData] = useState<{ totalTasks: number, doneTasks: number }>({ totalTasks: 0, doneTasks: 0 });
 
+    const [isPromptOpen, setIsPromptOpen] = useState(false);
+    const [hoveredKey, setHoveredKey] = useState<string | null>(null);
+
+    const handleMouseEnter = (key: string) => {
+        setHoveredKey(key);
+    };
+
+    const handleMouseLeave = () => {
+        setHoveredKey(null);
+    };
+
     // const wholePosts = getUserPosts();
     // wholePosts = [0: [title: "da"]]
 
@@ -35,7 +46,6 @@ export default function Dashboard() {
 
         Object.keys(posts).forEach((post: any) => {
             totalTasks++;
-            console.log(posts[post])
             if (posts[post].done) doneTasks++;
         });
 
@@ -78,16 +88,42 @@ export default function Dashboard() {
         updateUserPosts(cookies.get('user'), newPosts);
     }
 
-    const handleEdit = (id: any) => {
-        
-    }
-
     const handleCreate = () => {
-       
+        const title = (document.querySelector('input[type="text"]') as HTMLInputElement).value;
+        const description = (document.querySelector('input[type="text"]') as HTMLInputElement).value;
+        const deadline = (document.querySelector('input[type="date"]') as HTMLInputElement).value;
+        
+        let newPosts = posts;
+        // newPosts.push({ title: title, description: description, deadline: deadline, done: false });
+        // add to array without push
+        console.log(title, description, deadline)
+        newPosts[generalData.totalTasks + 1] = { title: title, desc: description, deadline: deadline, done: false };
+
+        console.log(newPosts)
+
+        setPosts(newPosts);
+        setFilteredPosts(newPosts);
+
+        calculateTotals();
+        updateUserPosts(cookies.get('user'), newPosts);
+        setIsPromptOpen(false);
     }
 
     return (
         <main>
+            {isPromptOpen && (
+                <div className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center'>
+                    <div className='bg-zinc-700 border border-1 border-stone-400 p-6 rounded-xl'>
+                        <div className='flex flex-col gap-y-4'>
+                            <input type="text" placeholder="Task title" className="w-full h-12 rounded-xl p-2 bg-transparent border border-1 border-stone-400 text-stone-300"/>
+                            <input type="text" placeholder="Task description" className="w-full h-12 rounded-xl p-2 bg-transparent border border-1 border-stone-400 text-stone-300"/>
+                            <input type="date" placeholder="Task deadline" className="w-full h-12 rounded-xl p-2 bg-transparent border border-1 border-stone-400 text-stone-300"/>
+                            <button onClick={() => handleCreate()} className='bg-transparent p-2 border border-1 border-stone-400 rounded-xl text-stone-400'>Create</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className='flex flex-col'>    
                 {/* profile */}
                 <div className='flex justify-center m-2'>
@@ -106,10 +142,6 @@ export default function Dashboard() {
                         <h2 className="font-black text-lg">Completed Tasks</h2>
                         <p className='font-bold text-lime-300'>{generalData.doneTasks}</p>
                     </div>
-                    {/* <div className="bg-transparent border border-1 border-stone-400 p-4 rounded-xl">
-                        <h2 className="font-black text-lg">Progress</h2>
-                        <p className='font-bold text-lime-300'>148</p>
-                    </div> */}
                 </div>
 
                 {/* posts */}
@@ -118,7 +150,7 @@ export default function Dashboard() {
                         
                         <div className='flex flex-row gap-x-4'>
                             <input onChange={(e) => {handleSearch(e.target.value);}} type="text" placeholder="Search tasks" className="w-full h-12 rounded-xl p-2 bg-transparent border border-1 border-stone-400 text-stone-300"/>
-                            <button onClick={() => handleCreate()} className='bg-transparent p-2 border border-1 border-stone-400 rounded-xl text-stone-400'><FontAwesomeIcon icon={faPlus} /></button>
+                            <button onClick={() => setIsPromptOpen(true)} className='bg-transparent p-2 border border-1 border-stone-400 rounded-xl text-stone-400'><FontAwesomeIcon icon={faPlus} /></button>
                         </div>
 
                         <div className='text-stone-300 font- border border-b-1 border-t-0 border-l-0 border-r-0 mt-4 mb-4'>
@@ -141,10 +173,13 @@ export default function Dashboard() {
                                             
                                             <div className='justify-between flex w-[100%]'>
                                                 <span className='text-stone-300 flex flex-row gap-x-2'>
-                                                    {filteredPosts[key].title} 
-                                                    <button className='transition-all hover:text-lime-500 text-stone-500' onClick={() => handleEdit(key)}>
-                                                        <FontAwesomeIcon icon={faListUl} />
-                                                    </button>
+                                                    <div 
+                                                        key={key}
+                                                        onMouseEnter={() => handleMouseEnter(key)}
+                                                        onMouseLeave={handleMouseLeave}
+                                                    >
+                                                        {hoveredKey === key ? filteredPosts[key].desc : filteredPosts[key].title}
+                                                    </div>
                                                     <button className='transition-all hover:text-red-500 text-stone-500' onClick={() => handleDelete(key)}>
                                                         <FontAwesomeIcon icon={faTrash} />
                                                     </button>
