@@ -5,13 +5,16 @@ import { useState, useEffect } from "react"
 import { useRouter } from 'next/navigation'
 import React from 'react';
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faListUl, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+
 import { getUserPosts, updateUserPosts } from '../../lib/auth';
 
 export default function Dashboard() {
     const cookies = useCookies()
     const router = useRouter()
 
-    if (cookies.get('user') === undefined) router.push('/signin') ;
+    if (cookies.get('user') === undefined) router.push('/signin');
 
     const [posts, setPosts] = useState<any[]>([]);
     const [filteredPosts, setFilteredPosts] = useState<any[]>([]);
@@ -64,6 +67,25 @@ export default function Dashboard() {
         updateUserPosts(cookies.get('user'), newPosts);
     }
 
+    const handleDelete = (id: any) => {
+        let newPosts = posts;
+        delete newPosts[id];
+
+        setPosts(newPosts);
+        setFilteredPosts(newPosts);
+
+        calculateTotals();
+        updateUserPosts(cookies.get('user'), newPosts);
+    }
+
+    const handleEdit = (id: any) => {
+        
+    }
+
+    const handleCreate = () => {
+       
+    }
+
     return (
         <main>
             <div className='flex flex-col'>    
@@ -93,7 +115,12 @@ export default function Dashboard() {
                 {/* posts */}
                 <div className='flex flex-col justify-center items-center'>
                     <div className='w-[50%] p-6'>
-                        <input onChange={(e) => {handleSearch(e.target.value);}} type="text" placeholder="Search tasks" className="w-full h-12 rounded-xl p-4 bg-transparent border border-1 border-stone-400 text-stone-300"/>
+                        
+                        <div className='flex flex-row gap-x-4'>
+                            <input onChange={(e) => {handleSearch(e.target.value);}} type="text" placeholder="Search tasks" className="w-full h-12 rounded-xl p-2 bg-transparent border border-1 border-stone-400 text-stone-300"/>
+                            <button onClick={() => handleCreate()} className='bg-transparent p-2 border border-1 border-stone-400 rounded-xl text-stone-400'><FontAwesomeIcon icon={faPlus} /></button>
+                        </div>
+
                         <div className='text-stone-300 font- border border-b-1 border-t-0 border-l-0 border-r-0 mt-4 mb-4'>
                             <div className='flex flex-row justify-between p-2'>
                                 <span>To-do <span className='text-stone-500'>({generalData.totalTasks} items)</span></span>
@@ -113,7 +140,15 @@ export default function Dashboard() {
                                             <div className="w-4 h-4 bg-transparent border-2 border-white rounded-xl peer-checked:bg-lime-600 peer-checked:border-lime-600"></div>
                                             
                                             <div className='justify-between flex w-[100%]'>
-                                                <span className='text-stone-300'>{filteredPosts[key].title}</span>
+                                                <span className='text-stone-300 flex flex-row gap-x-2'>
+                                                    {filteredPosts[key].title} 
+                                                    <button className='transition-all hover:text-lime-500 text-stone-500' onClick={() => handleEdit(key)}>
+                                                        <FontAwesomeIcon icon={faListUl} />
+                                                    </button>
+                                                    <button className='transition-all hover:text-red-500 text-stone-500' onClick={() => handleDelete(key)}>
+                                                        <FontAwesomeIcon icon={faTrash} />
+                                                    </button>
+                                                </span>
                                                 <span className='text-stone-400'>{filteredPosts[key].deadline}</span>
                                             </div>
                                         </label>
